@@ -15,4 +15,6 @@ class Rating extends Model
     {
         $this->hasMany(MasjidReview::class);
     }
+
+    protected $fillable = ["id",'desc'];
 }

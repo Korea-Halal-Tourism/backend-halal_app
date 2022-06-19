@@ -22,12 +22,12 @@ use App\Models\ForumComment;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+include __DIR__.'/api_custom_fe.php';
 Route::fallback(function () {
     return response()->json([
         'success' => false,
         'code' => 404,
-        'message' => 'Route Not Found', 
+        'message' => 'Route Not Found',
     ]);
 });
 

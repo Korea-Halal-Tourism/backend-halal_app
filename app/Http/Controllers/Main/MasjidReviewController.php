@@ -78,20 +78,23 @@ class MasjidReviewController extends Controller
         $image = $request->file('img');
         $files = array();
 
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             return response()->json([
                 'success' => false,
                 'code' => 401,
                 'message' => 'Login First',
             ]);
-        }else{
-            $destination = 'uploads/img/masjid_reviews/';
-            foreach($image as $img)
-            {
-                $ekstension = $img->getClientOriginalExtension();
-                $name = time().'masjid_review'.'.'.$ekstension;
-                if ($img->move($destination,$name)) {
-                    $files[] = $destination.$name;
+        } else {
+
+            //ARRAY FOR SAVING IMAGE
+            $dataFile = array();
+
+            if ($image != null) {
+                foreach ($image as $files) {
+                    $destinationPath = 'uploads/img/masjid_reviews/';
+                    $file_name = $request->user . "_" . uniqid() . $files->getClientOriginalName();
+                    if ($files->move($destinationPath, $file_name))
+                        $dataFile[] = $destinationPath . $file_name;
                 }
             }
 
@@ -104,14 +107,12 @@ class MasjidReviewController extends Controller
 
             if ($review->save()) {
 
-                foreach($files as $file)
-                {
+                foreach ($dataFile as $file) {
                     $reviewImage = new MasjidReviewImage();
                     $reviewImage->masjid_review_id = $review->id;
                     $reviewImage->path = $file;
                     $reviewImage->save();
                 }
-
                 return response()->json([
                     'success' => true,
                     'code' => 200,
@@ -139,7 +140,7 @@ class MasjidReviewController extends Controller
     {
         $review = MasjidReview::find($reviewId);
 
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             return response()->json([
                 'success' => false,
                 'code' => 401,
@@ -202,7 +203,7 @@ class MasjidReviewController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             return response()->json([
                 'success' => false,
                 'code' => 401,
@@ -250,20 +251,20 @@ class MasjidReviewController extends Controller
     {
         $review = MasjidReview::find($reviewId);
         $image = MasjidReviewImage::where('masjid_review_id', $reviewId);
-        if (! Auth::check()) {
+        if (!Auth::check()) {
             return response()->json([
                 'success' => false,
                 'code' => 401,
                 'message' => 'Login First',
             ]);
-        }else{
+        } else {
             if ($review == null) {
                 return response()->json([
                     'success' => false,
                     'code' => 404,
                     'message' => "masjid review not found"
                 ]);
-            }else{
+            } else {
                 try {
                     $image->delete();
                 } catch (\Throwable $th) {

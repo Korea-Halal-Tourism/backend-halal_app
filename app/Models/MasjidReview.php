@@ -30,4 +30,35 @@ class MasjidReview extends Model
     {
         return $this->hasMany(MasjidReviewImage::class);
     }
+
+    //start #mobreq
+    protected $appends =  ['review_category', 'review_photos','user_info'];
+
+    public function getUserInfoAttribute(){
+        $user = User::find($this->user_id);
+        return $user;
+    }
+
+    public function getReviewCategoryAttribute()
+    {
+        $ratings = Rating::all();
+        $ratingCategory = "";
+        foreach ($ratings as $item) {
+            if ($item->id == $this->rating_id) {
+                $ratingCategory = $item->name;
+            }
+        }
+        return $ratingCategory;
+    }
+
+
+    public function getReviewPhotosAttribute()
+    {
+        $ratings = MasjidReviewImage::where('masjid_review_id', '=', $this->id)->get();
+        $arrayPhotoUrl = array();
+        foreach ($ratings as $obj) {
+            array_push($arrayPhotoUrl, url("/") . "/" . $obj->path);
+        }
+        return $arrayPhotoUrl;
+    }
 }
